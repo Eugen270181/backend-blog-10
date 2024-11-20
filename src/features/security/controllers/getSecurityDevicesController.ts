@@ -3,9 +3,8 @@ import {HttpStatus} from "../../../common/types/enum/httpStatus";
 import {authServices} from "../../auth/services/authServices";
 import {SecurityOutputModel} from "../types/output/securityOutput.model";
 import {ResultStatus} from "../../../common/types/enum/resultStatus";
-import {securityServices} from "../services/securityServices";
 import {securityQueryRepository} from "../repository/securityQueryRepository";
-//TODO
+
 export const getSecurityDevicesController = async (req: Request, res: Response<SecurityOutputModel[]>) => {
     const refreshToken = req.cookies.refreshToken
     if (!refreshToken) return res.sendStatus(HttpStatus.Unauthorized)

@@ -1,13 +1,12 @@
-import {Request, Response} from 'express'
+import {Response} from 'express'
 import {HttpStatus} from "../../../common/types/enum/httpStatus";
 import {RequestWithParams} from "../../../common/types/requests.type";
 import {IdType} from "../../../common/types/id.type";
-import {commentsServices} from "../../comments/services/commentsServices";
 import {ResultStatus} from "../../../common/types/enum/resultStatus";
 import {authServices} from "../../auth/services/authServices";
 import {securityServices} from "../services/securityServices";
 import {securityRepository} from "../repository/securityRepository";
-//TODO
+
 export const delSecurityDeviceController = async (req: RequestWithParams<IdType>, res: Response) => {
     const sid = req.params.id
     const refreshToken = req.cookies.refreshToken
@@ -22,7 +21,7 @@ export const delSecurityDeviceController = async (req: RequestWithParams<IdType>
 
     if (foundSession.userId !== userId) return res.sendStatus(HttpStatus.Forbidden) //userId из входного RT - !owner foundSession
 
-    const deleteResult = await securityServices.deleteSession(foundSession._id)
+    await securityServices.deleteSession(foundSession._id)
 
     return  res.sendStatus(HttpStatus.NoContent)
 }
