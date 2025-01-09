@@ -1,16 +1,24 @@
 import {randomUUID} from "crypto";
 import {add} from "date-fns/add";
 
+export type EmailConfirmationModel = {
+    confirmationCode: string;
+    expirationDate: Date;
+    isConfirmed: boolean;
+}
+
+export type PassConfirmationModel = {
+    confirmationCode: string;
+    expirationDate: Date;
+}
+
 export class User {
-    login: string;
-    email: string;
-    passwordHash: string;
-    createdAt: Date;
-    emailConfirmation: {
-        confirmationCode: string;
-        expirationDate: Date;
-        isConfirmed: boolean;
-    }
+    login: string
+    email: string
+    passwordHash: string
+    createdAt: Date
+    emailConfirmation: EmailConfirmationModel
+    passConfirmation: PassConfirmationModel
 
     constructor(login: string, email: string, hash: string) {
         this.login = login
@@ -21,6 +29,10 @@ export class User {
             expirationDate: add( new Date(), { hours: 1, minutes: 30 } ),
             confirmationCode: randomUUID(),
             isConfirmed: false
+        }
+        this.passConfirmation = {
+            confirmationCode: '',
+            expirationDate: new Date()
         }
     }
 }

@@ -1,6 +1,6 @@
 //import {DBType, ReadonlyDBType} from '../../src/db/dbMemory'
-//import {BlogDbModel} from '../../src/common/types/db/blog-db.model'
-//import {PostDbModel} from '../../src/common/types/db/post-db.model'
+//import {Blog} from '../../src/common/types/db/blog-db.model'
+//import {PostModel} from '../../src/common/types/db/post-db.model'
 //import {appConfig} from '../../src/common/settings/config'
 
 // готовые данные для переиспользования в тестах

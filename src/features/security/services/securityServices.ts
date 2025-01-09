@@ -1,12 +1,11 @@
 import {ObjectId} from "bson";
-import {SecurityDbModel} from "../types/securityDb.model";
 
-import {securityRepository} from "../repository/securityRepository";
+import {securityRepository} from "../repositories/securityRepository";
 import {WithId} from "mongodb";
+import {SessionModel} from "../models/session.model";
 
 export const securityServices = {
-    async createSession(sessionObject:WithId<SecurityDbModel>) {
-
+    async createSession(sessionObject:WithId<SessionModel>) {
         return securityRepository.createSession(sessionObject)
     },
     async deleteSession(_id:ObjectId){

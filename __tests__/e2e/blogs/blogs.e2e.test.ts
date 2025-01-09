@@ -20,7 +20,7 @@ describe(`<<BLOGS>> ENDPOINTS TESTING!!!`, ()=>{
     beforeAll(async () => {
         //const mongoServer = await MongoMemoryServer.create()
         //await db.run(mongoServer.getUri());
-        await db.run(appConfig.MONGO_URL);
+        await db.run(appConfig.MONGO_URI);
         await db.drop();
     })
     afterAll(async () => {

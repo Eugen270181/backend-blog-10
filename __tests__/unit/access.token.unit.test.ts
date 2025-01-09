@@ -3,7 +3,7 @@ import {db} from "../../src/db";
 import {authService} from "../../src/auth/auth.service";
 import {jwtService} from "../../src/common/adapters/jwt.service";
 import {ResultStatus} from "../../src/common/types/resultCode";
-import {usersRepository} from "../../src/users/user.repository";
+import {usersRepository} from "../../src/users/user.repositories";
 
 describe('UNIT', () => {
 

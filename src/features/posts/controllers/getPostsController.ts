@@ -1,5 +1,5 @@
 import {Response} from 'express'
-import {postsQueryRepository} from "../repository/postsQueryRepository";
+import {postsQueryRepository} from "../repositories/postsQueryRepository";
 import {querySortSanitizer} from "../../../common/module/querySortSanitizer";
 import {HttpStatus} from "../../../common/types/enum/httpStatus";
 import {SortQueryFilterType} from "../../../common/types/sortQueryFilter.type";

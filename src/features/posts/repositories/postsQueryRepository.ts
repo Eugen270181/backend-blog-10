@@ -1,15 +1,15 @@
 import {db} from "../../../common/module/db/db"
 import {ObjectId, WithId} from "mongodb"
 import {PostOutputModel} from "../types/output/postOutput.model";
-import {PostDbModel} from "../types/postDb.model";
 import {SortQueryFilterType} from "../../../common/types/sortQueryFilter.type";
 import {pagPostOutputModel} from "../types/output/pagPostOutput.model";
+import {PostModel} from "../models/post.model";
 
 export const postsQueryRepository = {
     async findPostById(id: string) {
         const isIdValid = ObjectId.isValid(id)
         if (!isIdValid) return null
-        return db.getCollections().postsCollection.findOne({ _id: new ObjectId(id) })
+        return db.getModels().PostModel.findOne({ _id: new ObjectId(id) })
     },
     async findPostAndMap(id: string) {
         const post = await this.findPostById(id)
@@ -19,13 +19,13 @@ export const postsQueryRepository = {
         const filter = blogId?{blogId}:{}
         //const search = query.searchNameTerm ? {title:{$regex:query.searchNameTerm,$options:'i'}}:{}
         try {
-            const posts = await db.getCollections().postsCollection
+            const posts = await db.getModels().PostModel
                 .find(filter)
-                .sort(query.sortBy,query.sortDirection)
+                .sort({[query.sortBy]:query.sortDirection})
                 .skip((query.pageNumber-1)*query.pageSize)
                 .limit(query.pageSize)
-                .toArray()
-            const totalCount = await db.getCollections().postsCollection.countDocuments(filter)
+                .lean()
+            const totalCount = await db.getModels().PostModel.countDocuments(filter)
             return {
                 pagesCount: Math.ceil(totalCount/query.pageSize),
                 page: query.pageNumber,
@@ -40,7 +40,7 @@ export const postsQueryRepository = {
         }
 
     },
-    map(post:WithId<PostDbModel>):PostOutputModel{
+    map(post:WithId<PostModel>):PostOutputModel{
         const { _id, ...postForOutput } = post;//деструктуризация
         return {id:post._id.toString(),...postForOutput}
     },

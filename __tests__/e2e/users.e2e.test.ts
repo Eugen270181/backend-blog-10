@@ -23,7 +23,7 @@ describe('USERS_TESTS', () => {
     beforeAll(async () => {
         const mongoServer = await MongoMemoryServer.create()
         await db.run(mongoServer.getUri());
-        //await db.run(appConfig.MONGO_URL);
+        //await db.run(appConfig.MONGO_URI);
     })
 
     beforeEach(async () => {

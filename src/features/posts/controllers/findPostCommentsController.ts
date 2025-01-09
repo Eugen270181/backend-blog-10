@@ -2,7 +2,7 @@ import {Response} from 'express'
 import {commentsQueryRepository} from "../../comments/repositories/commentsQueryRepository";
 import {querySortSanitizer} from "../../../common/module/querySortSanitizer";
 import {pagCommentOutputModel} from "../../comments/types/output/pagCommentOutput.model";
-import {postsRepository} from "../repository/postsRepository";
+import {postsRepository} from "../repositories/postsRepository";
 import {HttpStatus} from "../../../common/types/enum/httpStatus";
 import {RequestWithParamsAndQuery} from "../../../common/types/requests.type";
 import {IdType} from "../../../common/types/id.type";

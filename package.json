@@ -23,6 +23,7 @@
     "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.9.0",
     "mongodb-memory-server": "^9.1.4",
+    "mongoose": "^8.8.3",
     "nodemailer": "^6.9.8",
     "supertest": "^6.3.3",
     "ts-jest": "^29.1.1",

@@ -1,16 +1,16 @@
 import {db} from "../../../common/module/db/db"
 import {ObjectId, WithId} from "mongodb"
 import {UserOutputModel} from "../types/output/userOutput.type";
-import {UserDbModel} from "../types/userDb.model";
 import {MeOutputModel} from "../../auth/types/output/meOutput.model";
 import {UsersQueryFilterType} from "../types/usersQueryFilter.type";
 import {Pagination} from "../../../common/types/pagination.type";
+import {UserModel} from "../models/user.model";
 
 export const usersQueryRepository = {
     async getUserById(id: string) {
         const isIdValid = ObjectId.isValid(id);
         if (!isIdValid) return null
-        return db.getCollections().usersCollection.findOne({ _id: new ObjectId(id) });
+        return db.getModels().UserModel.findOne({ _id: new ObjectId(id) });
     },
     async getMapUser(id: string) {
         const user = await this.getUserById(id)
@@ -26,13 +26,13 @@ export const usersQueryRepository = {
         const searchEmail = query.searchEmailTerm ? {email:{$regex:query.searchEmailTerm,$options:'i'}}:{}
         const search = {$or:[searchLogin,searchEmail]}
         try {
-            const users = await db.getCollections().usersCollection
+            const users = await db.getModels().UserModel
                 .find(search)
-                .sort(query.sortBy,query.sortDirection)
+                .sort({[query.sortBy]:query.sortDirection})
                 .skip((query.pageNumber-1)*query.pageSize)
                 .limit(query.pageSize)
-                .toArray()
-            const totalCount = await db.getCollections().usersCollection.countDocuments(search)
+                .lean()
+            const totalCount = await db.getModels().UserModel.countDocuments(search)
             return {
                 pagesCount: Math.ceil(totalCount/query.pageSize),
                 page: query.pageNumber,
@@ -47,11 +47,11 @@ export const usersQueryRepository = {
         }
 
     },
-    mapUser(user:WithId<UserDbModel>):UserOutputModel{
+    mapUser(user:WithId<UserModel>):UserOutputModel{
         const { _id,createdAt,login, email} = user;//деструктуризация
-        return { id:user._id.toString(), createdAt:user.createdAt.toISOString(), login, email }
+        return { id:_id.toString(), createdAt:user.createdAt.toISOString(), login, email }
     },
-    mapMe(user:WithId<UserDbModel>):MeOutputModel{
+    mapMe(user:WithId<UserModel>):MeOutputModel{
         const { _id,email, login} = user;//деструктуризация
         return { email, login, userId:_id.toString()}
     },

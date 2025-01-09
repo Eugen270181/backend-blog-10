@@ -1,26 +1,29 @@
 import {db} from "../../../common/module/db/db"
 import {ObjectId} from "mongodb"
-import {CommentDbModel} from "../types/commentDb.model";
 import {UpdateCommentInputModel} from "../types/input/updateCommentInput.model";
+import {CommentDocument, CommentModel} from "../models/comment.model";
 
 export const commentsRepository = {
-    async createComment(comment:CommentDbModel):Promise<string> {
-        const result = await db.getCollections().commentsCollection.insertOne(comment)
-        return result.insertedId.toString() // return _id -objectId
+    async createComment(comment:CommentModel):Promise<string> {
+        const CommentsModel = db.getModels().CommentModel
+        const newCommentToDB = new CommentsModel(comment)
+        await newCommentToDB.save()
+        return newCommentToDB._id.toString()
     },
-    async findCommentById(id: string) {
-        const isIdValid = ObjectId.isValid(id);
-        if (!isIdValid) return null
-        return db.getCollections().commentsCollection.findOne({ _id: new ObjectId(id) });
+    async findCommentById(id: string):Promise< CommentDocument | null > {
+        const CommentsModel = db.getModels().CommentModel
+        return CommentsModel.findOne({ _id: id });
     },
-    async deleteComment(id:ObjectId){
-        const result = await db.getCollections().commentsCollection.deleteOne({ _id: id });
+    async deleteComment(id:ObjectId):Promise<Boolean> {
+        const CommentsModel = db.getModels().CommentModel
+        const result = await CommentsModel.deleteOne({ _id: id });
         return result.deletedCount > 0
     },
-    async updateComment(comment:UpdateCommentInputModel, id:string) {
-        const filter = { _id: new ObjectId(id) }
+    async updateComment(comment:UpdateCommentInputModel, id:string):Promise<Boolean> {
+        const CommentsModel = db.getModels().CommentModel
+        const filter = { _id: id }
         const updater = { $set: { ...comment } }
-        const result = await db.getCollections().commentsCollection.updateOne(filter, updater)
+        const result = await CommentsModel.updateOne(filter, updater)
         return result.modifiedCount > 0
     },
 }

@@ -1,8 +1,9 @@
-import {commentatorInfo} from "../commentDb.model";
+import {CommentatorInfo} from "../../models/comment.model";
+
 
 export type CommentOutputModel = {
     id:string
     content: string
-    commentatorInfo: commentatorInfo
+    commentatorInfo: CommentatorInfo
     createdAt: string
 }

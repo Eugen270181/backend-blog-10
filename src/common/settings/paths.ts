@@ -15,7 +15,9 @@ export const routersPaths = {
         registration: '/registration',
         registrationConfirmation: '/registration-confirmation',
         registrationEmailResending: '/registration-email-resending',
+        passwordRecovery: '/password-recovery',
+        newPassword: '/new-password',
         refreshToken: '/refresh-token',
-        logout: '/logout'
+        logout: '/logout',
     }
 }

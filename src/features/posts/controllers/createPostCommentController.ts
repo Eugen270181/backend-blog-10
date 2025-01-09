@@ -1,6 +1,6 @@
 import {Response} from 'express'
 import {commentsServices} from "../../comments/services/commentsServices";
-import {postsRepository} from "../repository/postsRepository";
+import {postsRepository} from "../repositories/postsRepository";
 import {CreateCommentInputModel} from "../../comments/types/input/createCommentInput.model";
 import {CommentOutputModel} from "../../comments/types/output/commentOutput.model";
 import {commentsQueryRepository} from "../../comments/repositories/commentsQueryRepository";

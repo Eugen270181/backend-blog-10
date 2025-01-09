@@ -7,17 +7,18 @@ import {jwtServices} from "../../../common/adapters/jwtServices";
 import {nodemailerServices} from "../../../common/adapters/nodemailerServices";
 import {User} from "../../users/classes/user.class";
 import {CreateUserInputModel} from "../../users/types/input/createUserInput.type";
-import {UserDbModel} from "../../users/types/userDb.model";
 import {LoginSuccessOutputModel} from "../types/output/loginSuccessOutput.model";
 import { add } from 'date-fns/add';
 import {appConfig} from "../../../common/settings/config";
 import {UserIdType} from "../../../common/types/userId.type";
-import {securityRepository} from "../../security/repository/securityRepository";
-import {SecurityDbModel} from "../../security/types/securityDb.model";
+import {securityRepository} from "../../security/repositories/securityRepository";
 import {ObjectId, WithId} from "mongodb";
 import { v4 as uuidv4 } from 'uuid'
 import {randomUUID} from "crypto";
 import {securityServices} from "../../security/services/securityServices";
+import {emailExamples} from "../../../common/adapters/emailExamples";
+import {UserModel} from "../../users/models/user.model";
+import {SessionModel} from "../../security/models/session.model";
 
 function parseDuration(duration: string) {
     const units: { [key: string]: string } = {
@@ -75,7 +76,7 @@ export const authServices = {
         return result
     },
     async checkUserCredentials(loginOrEmail: string, password: string) {
-        const result = new ResultClass<WithId<UserDbModel>>()
+        const result = new ResultClass<WithId<UserModel>>()
         const user = await usersRepository.findByLoginOrEmail(loginOrEmail);
         // Проверка на наличие пользователя
         if (!user) {
@@ -144,7 +145,7 @@ export const authServices = {
         return result
     },
     async checkRefreshToken(refreshToken: string) {
-        const result = new ResultClass<WithId<SecurityDbModel>>()
+        const result = new ResultClass<WithId<SessionModel>>()
         const jwtPayload = await jwtServices.verifyToken(refreshToken, appConfig.RT_SECRET)
 
         if (jwtPayload) {
@@ -206,7 +207,32 @@ export const authServices = {
         result.status = ResultStatus.Success
         return result
     },
-    async confirmEmail(code: string) {
+    async resendRegCodeEmail(email:string) {
+        const result = new ResultClass()
+        const user = await usersRepository.findUserByEmail(email)
+        if (!user) {
+            result.addError("Users account with this Email not found!", "email")
+            return result
+        }
+        if (user.emailConfirmation.isConfirmed) {
+            result.addError('Users account with this email already activated!','email')
+            return result
+        }
+        const newConfirmationCode = randomUUID()
+        const newConfirmationDate =add( new Date(), parseDuration(appConfig.EMAIL_TIME) )
+        const isUpdateConfirmationCode = await usersRepository.setRegConfirmationCode(user._id,newConfirmationCode,newConfirmationDate)
+        if (!isUpdateConfirmationCode) {
+            result.addError('Something wrong with activate your account, try later','email')
+            return result
+        }
+        nodemailerServices
+          .sendEmail(email, emailExamples.registrationEmail(newConfirmationCode))
+          .catch((er) => console.error('error in send email:', er));
+
+        result.status = ResultStatus.Success
+        return result
+    },
+    async confirmRegCodeEmail(code: string) {
         const result = new ResultClass()
         const user = await usersRepository.findUserByRegConfirmCode(code)
 
@@ -223,9 +249,9 @@ export const authServices = {
             return result
         }
 
-        const isUpdateConfirmation = await usersRepository.updateConfirmation(user._id)
+        const activateConfirmation = await usersRepository.activateConfirmation(user._id)
 
-        if (!isUpdateConfirmation) {
+        if (!activateConfirmation) {
             result.addError('Something wrong with activate your account, try later','code')
             return result
         }
@@ -233,27 +259,46 @@ export const authServices = {
         result.status = ResultStatus.Success
         return result
     },
-    async resendEmail(email:string) {
+    async resendPassCodeEmail(email:string) {
         const result = new ResultClass()
         const user = await usersRepository.findUserByEmail(email)
+        if (user) {
+            const newConfirmationCode = randomUUID()
+            const newConfirmationDate = add(new Date(), parseDuration(appConfig.EMAIL_TIME))
+            const isUpdateConfirmationCode = await usersRepository.setPassConfirmationCode(user._id, newConfirmationCode, newConfirmationDate)
+            if (!isUpdateConfirmationCode) {
+                result.addError('Something wrong with recover your password, try later', 'email')
+                return result
+            }
+            nodemailerServices
+                .sendEmail(email, emailExamples.passwordRecoveryEmail(newConfirmationCode))
+                .catch((er) => console.error('error in send email:', er));
+        }
+
+        result.status = ResultStatus.Success
+        return result
+    },
+    async confirmPassCodeEmail(newPassword:string, recoveryCode: string) {
+        const result = new ResultClass()
+        const user = await usersRepository.findUserByPassConfirmCode(recoveryCode)
+
         if (!user) {
-            result.addError("Users account with this Email not found!", "email")
+            result.addError('Password confirmation code is incorrect','code')
             return result
         }
-        if (user.emailConfirmation.isConfirmed) {
-            result.addError('Users account with this email already activated!','email')
+        if (user.passConfirmation.expirationDate < new Date()) {
+            result.addError('Password confirmation code is expired','recoveryCode')
             return result
         }
-        const newConfirmationCode = randomUUID()
-        const newConfirmationDate =add( new Date(), parseDuration(appConfig.EMAIL_TIME) )
-        const isUpdateConfirmationCode = await usersRepository.setConfirmationCode(user._id,newConfirmationCode,newConfirmationDate)
-        if (!isUpdateConfirmationCode) {
-            result.addError('Something wrong with activate your account, try later','email')
+
+        const newPasswordHash = await hashServices.getHash(newPassword)
+
+        const isUpdatePassHash = await usersRepository.updatePassHash(user._id, newPasswordHash)
+
+        if (!isUpdatePassHash) {
+            result.addError('Something wrong with recover your password, try later','recoveryCode')
             return result
         }
-        nodemailerServices
-          .sendEmail(email, newConfirmationCode)
-          .catch((er) => console.error('error in send email:', er));
 
         result.status = ResultStatus.Success
         return result

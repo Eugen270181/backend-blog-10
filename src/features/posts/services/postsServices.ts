@@ -1,17 +1,17 @@
-import {PostDbModel} from '../types/postDb.model'
 import {ObjectId} from "mongodb"
-import {blogsRepository} from '../../blogs/repositories/blogsRepository'
+import {BlogsRepository} from '../../blogs/repositories/blogsRepository'
 import {CreatePostInputModel} from "../types/input/createPostInput.model";
 import {UpdatePostInputModel} from "../types/input/updatePostInput.model";
-import {postsRepository} from "../repository/postsRepository";
+import {postsRepository} from "../repositories/postsRepository";
+import {PostModel} from "../models/post.model";
 
 
 export const postsServices = {
     async createPost(post: CreatePostInputModel) {
         const {title, shortDescription, content, blogId} = post
-        const newPost: PostDbModel = {
+        const newPost: PostModel = {
             ...{title, shortDescription, content, blogId},
-            blogName: (await blogsRepository.findBlogById(post.blogId))!.name,
+            blogName: (await BlogsRepository.findBlogById(post.blogId))!.name,
             createdAt: new Date().toISOString()
         }
         return postsRepository.createPost(newPost) // return _id -objectId
@@ -25,7 +25,7 @@ export const postsServices = {
         const isIdValid = ObjectId.isValid(id);
         if (!isIdValid) return false
         const {title, shortDescription, content, blogId} = post
-        const blog = await blogsRepository.findBlogById(post.blogId)
+        const blog = await BlogsRepository.findBlogById(blogId)
         if(!blog) return false
         const updateObject = {...{title, shortDescription, content, blogId},  blogName:blog.name}
         return postsRepository.updatePost(updateObject,id)

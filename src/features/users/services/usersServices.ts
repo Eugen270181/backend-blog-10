@@ -1,10 +1,10 @@
 import {usersRepository} from "../repositories/usersRepository";
 import {ObjectId} from "bson";
 import {CreateUserInputModel} from "../types/input/createUserInput.type";
-import {UserDbModel} from "../types/userDb.model";
 import {hashServices} from "../../../common/adapters/hashServices";
 import {ResultClass} from '../../../common/classes/result.class';
 import {ResultStatus} from "../../../common/types/enum/resultStatus";
+import {UserModel} from "../models/user.model";
 
 export const usersServices = {
     async createUser(user: CreateUserInputModel) {
@@ -20,7 +20,8 @@ export const usersServices = {
             return result
         }
 
-        const newUser: UserDbModel = {
+
+        const newUser: UserModel = {
             ...{login, email},
             passwordHash: await hashServices.getHash(password),
             createdAt: new Date(),
@@ -28,6 +29,10 @@ export const usersServices = {
                 confirmationCode: '',
                 expirationDate: new Date(),
                 isConfirmed: true
+            },
+            passConfirmation: {
+                confirmationCode: '',
+                expirationDate: new Date()
             }
         }
 

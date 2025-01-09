@@ -6,11 +6,12 @@ export const appConfig = {
     //ADMIN: process.env.ADMIN || 'admin:qwerty',
     MONGO_URL:process.env.MONGO_URL as string,
     DB_NAME:process.env.DB_NAME as string || 'BlogsPosts',
+    MONGO_URI:process.env.MONGO_URI || `mongodb://0.0.0.0:27017/${process.env.DB_NAME}`,
     BLOGS_COLLECTION_NAME:process.env.BLOGS_COLLECTION_NAME || 'Blogs',
     POSTS_COLLECTION_NAME:process.env.POSTS_COLLECTION_NAME || 'Posts',
     USERS_COLLECTION_NAME:process.env.USERS_COLLECTION_NAME || 'Users',
     COMMENTS_COLLECTION_NAME:process.env.COMMENTS_COLLECTION_NAME || 'Comments',
-    REQUESTS_COLLECTION_NAME:process.env.REQUESTS_COLLECTION_NAME || 'RequestsLog',
+    REQUESTS_COLLECTION_NAME:process.env.REQUESTS_COLLECTION_NAME || 'RequestsLogs',
     SESSIONS_COLLECTION_NAME:process.env.SESSIONS_COLLECTION_NAME || 'Sessions',
 
     AT_SECRET:process.env.DB_NAME as string || 'f1f5deg4hy5fr5d5g',

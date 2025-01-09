@@ -1,4 +1,4 @@
-export type PostDbModel = {
+export type PostModel = {
     title: string // max 30
     shortDescription: string // max 100
     content: string // max 1000

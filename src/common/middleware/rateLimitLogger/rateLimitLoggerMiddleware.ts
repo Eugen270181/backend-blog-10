@@ -8,7 +8,7 @@ export const rateLimitLoggerMiddleware = async (req: Request, res: Response, nex
 
         try {
             // Подсчет запросов за последние 10 секунд
-            const requestCount = await db.getCollections().requestsLogCollection.countDocuments({
+            const requestCount = await db.getModels().RequestsLogModel.countDocuments({
                 ip: ip,
                 url: url,
                 date: { $gte: startTimeReqCounter },
@@ -18,8 +18,8 @@ export const rateLimitLoggerMiddleware = async (req: Request, res: Response, nex
             if (requestCount >= 5) return res.status(429).send({ message: 'Превышено количество запросов. Попробуйте позже.'})
 
             // Сохранение запроса в базе данных
-            await db.getCollections().requestsLogCollection.insertOne({ ip, url, date: now });
-            //await db.getCollections().requestsLogCollection.deleteMany({ ip, url, date: { $lt: startTimeReqCounter } });
+            await db.getModels().RequestsLogModel.create({ ip, url, date: now });
+            //await db.getModels().RequestsLogModel.deleteMany({ ip, url, date: { $lt: startTimeReqCounter } });
 
             next(); // Передаем управление дальше
         } catch (error) {

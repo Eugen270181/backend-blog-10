@@ -3,7 +3,7 @@ import {HttpStatus} from "../../../common/types/enum/httpStatus";
 import {authServices} from "../../auth/services/authServices";
 import {SecurityOutputModel} from "../types/output/securityOutput.model";
 import {ResultStatus} from "../../../common/types/enum/resultStatus";
-import {securityQueryRepository} from "../repository/securityQueryRepository";
+import {securityQueryRepository} from "../repositories/securityQueryRepository";
 
 export const getSecurityDevicesController = async (req: Request, res: Response<SecurityOutputModel[]>) => {
     const refreshToken = req.cookies.refreshToken

@@ -1,8 +1,10 @@
 import {body} from 'express-validator'
 import {inputValidationMiddleware} from '../../../common/middleware/inputValidationMiddleware'
-import {blogsRepository} from '../../blogs/repositories/blogsRepository'
+import {BlogsRepository} from '../../blogs/repositories/blogsRepository'
 import {WithId} from "mongodb";
-import {BlogDbModel} from "../../blogs/types/blogDb.model";
+import {Blog} from "../../blogs/domain/blog.entity";
+import {BlogsQueryRepository} from "../../blogs/repositories/blogsQueryRepository";
+
 
 export const titleValidator = body('title').isString().withMessage('not string')
     .trim().isLength({min: 1, max: 30}).withMessage('more then 30 or 0')
@@ -13,7 +15,7 @@ export const contentValidator = body('content').isString().withMessage('not stri
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 export const blogIdValidator = body('blogId').isString().withMessage('not string')
     .trim().custom(async (blogId:string) => {
-        let blog:WithId<BlogDbModel>|null= await blogsRepository.findBlogById(blogId)
+        let blog= await (new BlogsRepository()).findBlogById(blogId)
         if (!blog) {throw new Error('Incorrect blogId!')}
         // console.log(blog)
         return true

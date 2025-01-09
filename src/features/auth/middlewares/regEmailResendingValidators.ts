@@ -2,7 +2,7 @@ import {emailResendingValidator} from "../../../common/middleware/bodyValidators
 import {inputValidationMiddleware} from "../../../common/middleware/inputValidationMiddleware";
 
 
-export const emailResendingAuthValidators = [
+export const regEmailResendingAuthValidators = [
     emailResendingValidator,
 
     inputValidationMiddleware,

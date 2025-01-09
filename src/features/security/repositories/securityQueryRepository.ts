@@ -1,8 +1,7 @@
 import {db} from "../../../common/module/db/db"
 import {ObjectId, WithId} from "mongodb"
-import {SortQueryFilterType} from "../../../common/types/sortQueryFilter.type";
 import {SecurityOutputModel} from "../types/output/securityOutput.model";
-import {SecurityDbModel} from "../types/securityDb.model";
+import {SessionModel} from "../models/session.model";
 
 export const securityQueryRepository = {
     async getActiveSessionsAndMap(userId?:string):Promise<SecurityOutputModel[]> { // используем этот метод если проверили валидность и существование в бд значения blogid
@@ -10,7 +9,7 @@ export const securityQueryRepository = {
         const filter = {"expDate":{ $gt:dateNow }, ...(userId && { userId })}
 
         try {
-            const sessions = await db.getCollections().sessionsCollection.find(filter).toArray()
+            const sessions = await db.getModels().SessionModel.find(filter).lean()
 
             return sessions.map(this.map)
         }
@@ -19,7 +18,7 @@ export const securityQueryRepository = {
             throw new Error(JSON.stringify(e))
         }
     },
-    map(session:WithId<SecurityDbModel>):SecurityOutputModel {
+    map(session:WithId<SessionModel>):SecurityOutputModel {
         const { ip, title, lastActiveDate, _id} = session;//деструктуризация
         return { deviceId:_id.toString(), ip, lastActiveDate:lastActiveDate.toISOString(), title  }
     }

@@ -5,7 +5,7 @@ import {IdType} from "../../../common/types/id.type";
 import {ResultStatus} from "../../../common/types/enum/resultStatus";
 import {authServices} from "../../auth/services/authServices";
 import {securityServices} from "../services/securityServices";
-import {securityRepository} from "../repository/securityRepository";
+import {securityRepository} from "../repositories/securityRepository";
 
 export const delSecurityDeviceController = async (req: RequestWithParams<IdType>, res: Response) => {
     const sid = req.params.id
