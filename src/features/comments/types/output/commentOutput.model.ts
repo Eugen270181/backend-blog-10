@@ -1,4 +1,4 @@
-import {CommentatorInfo} from "../../models/comment.model";
+import {CommentatorInfo} from "../../domain/comment.entity";
 
 
 export type CommentOutputModel = {

@@ -4,7 +4,7 @@ import {UserOutputModel} from "../types/output/userOutput.type";
 import {MeOutputModel} from "../../auth/types/output/meOutput.model";
 import {UsersQueryFilterType} from "../types/usersQueryFilter.type";
 import {Pagination} from "../../../common/types/pagination.type";
-import {UserModel} from "../models/user.model";
+import {User} from "../domain/user.entity";
 
 export const usersQueryRepository = {
     async getUserById(id: string) {
@@ -47,11 +47,11 @@ export const usersQueryRepository = {
         }
 
     },
-    mapUser(user:WithId<UserModel>):UserOutputModel{
+    mapUser(user:WithId<User>):UserOutputModel{
         const { _id,createdAt,login, email} = user;//деструктуризация
         return { id:_id.toString(), createdAt:user.createdAt.toISOString(), login, email }
     },
-    mapMe(user:WithId<UserModel>):MeOutputModel{
+    mapMe(user:WithId<User>):MeOutputModel{
         const { _id,email, login} = user;//деструктуризация
         return { email, login, userId:_id.toString()}
     },

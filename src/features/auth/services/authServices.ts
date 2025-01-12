@@ -17,8 +17,8 @@ import { v4 as uuidv4 } from 'uuid'
 import {randomUUID} from "crypto";
 import {securityServices} from "../../security/services/securityServices";
 import {emailExamples} from "../../../common/adapters/emailExamples";
-import {UserModel} from "../../users/models/user.model";
-import {SessionModel} from "../../security/models/session.model";
+import {User} from "../../users/domain/user.entity";
+import {Session} from "../../security/domain/session.entity";
 
 function parseDuration(duration: string) {
     const units: { [key: string]: string } = {
@@ -76,7 +76,7 @@ export const authServices = {
         return result
     },
     async checkUserCredentials(loginOrEmail: string, password: string) {
-        const result = new ResultClass<WithId<UserModel>>()
+        const result = new ResultClass<WithId<User>>()
         const user = await usersRepository.findByLoginOrEmail(loginOrEmail);
         // Проверка на наличие пользователя
         if (!user) {
@@ -145,7 +145,7 @@ export const authServices = {
         return result
     },
     async checkRefreshToken(refreshToken: string) {
-        const result = new ResultClass<WithId<SessionModel>>()
+        const result = new ResultClass<WithId<Session>>()
         const jwtPayload = await jwtServices.verifyToken(refreshToken, appConfig.RT_SECRET)
 
         if (jwtPayload) {

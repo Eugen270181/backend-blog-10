@@ -13,7 +13,7 @@ export const rateLimitLoggerMiddleware = async (req: Request, res: Response, nex
                 url: url,
                 date: { $gte: startTimeReqCounter },
             });
-            console.log(requestCount)
+            //console.log(requestCount)
 
             if (requestCount >= 5) return res.status(429).send({ message: 'Превышено количество запросов. Попробуйте позже.'})
 

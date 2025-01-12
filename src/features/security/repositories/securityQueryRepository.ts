@@ -1,7 +1,7 @@
 import {db} from "../../../common/module/db/db"
 import {ObjectId, WithId} from "mongodb"
 import {SecurityOutputModel} from "../types/output/securityOutput.model";
-import {SessionModel} from "../models/session.model";
+import {Session} from "../domain/session.entity";
 
 export const securityQueryRepository = {
     async getActiveSessionsAndMap(userId?:string):Promise<SecurityOutputModel[]> { // используем этот метод если проверили валидность и существование в бд значения blogid
@@ -18,7 +18,7 @@ export const securityQueryRepository = {
             throw new Error(JSON.stringify(e))
         }
     },
-    map(session:WithId<SessionModel>):SecurityOutputModel {
+    map(session:WithId<Session>):SecurityOutputModel {
         const { ip, title, lastActiveDate, _id} = session;//деструктуризация
         return { deviceId:_id.toString(), ip, lastActiveDate:lastActiveDate.toISOString(), title  }
     }

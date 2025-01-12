@@ -3,7 +3,7 @@ import {ObjectId, WithId} from "mongodb"
 import {PostOutputModel} from "../types/output/postOutput.model";
 import {SortQueryFilterType} from "../../../common/types/sortQueryFilter.type";
 import {pagPostOutputModel} from "../types/output/pagPostOutput.model";
-import {PostModel} from "../models/post.model";
+import {Post} from "../domain/post.entity";
 
 export const postsQueryRepository = {
     async findPostById(id: string) {
@@ -40,7 +40,7 @@ export const postsQueryRepository = {
         }
 
     },
-    map(post:WithId<PostModel>):PostOutputModel{
+    map(post:WithId<Post>):PostOutputModel{
         const { _id, ...postForOutput } = post;//деструктуризация
         return {id:post._id.toString(),...postForOutput}
     },

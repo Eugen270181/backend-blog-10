@@ -21,7 +21,6 @@ export class Blog {
         this.deletedAt = null
         this.isMembership = false
     }
-
     delete(){
         this.deletedAt = new Date()
     }
@@ -30,7 +29,6 @@ export class Blog {
         this.description = description??this.description
         this.websiteUrl = websiteUrl??this.websiteUrl
     }
-
 }
 
 export const blogSchema:Schema<Blog> = new Schema<Blog>({

@@ -4,7 +4,7 @@ import {CreateCommentInputModel} from "../types/input/createCommentInput.model";
 import {UpdateCommentInputModel} from "../types/input/updateCommentInput.model";
 import {usersRepository} from "../../users/repositories/usersRepository";
 import {ResultStatus} from "../../../common/types/enum/resultStatus";
-import {CommentModel} from "../models/comment.model";
+import {Comment} from "../domain/comment.entity";
 
 
 
@@ -12,7 +12,7 @@ export const commentsServices = {
     async createComment(commentInput: CreateCommentInputModel, postId:string, userId:string) {
         const user=await usersRepository.getUserById(userId)
         const {content} = commentInput
-        const newComment:CommentModel = {
+        const newComment:Comment = {
             content,
             commentatorInfo:{userId:user!._id.toString(),userLogin:user!.login},
             createdAt: new Date().toISOString(),

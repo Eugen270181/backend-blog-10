@@ -1,7 +1,7 @@
 import {db} from "../../../common/module/db/db"
 import {ObjectId, WithId} from "mongodb"
 import {SessionFindType} from "../../../common/types/sessionFind.type";
-import {SessionModel} from "../models/session.model";
+import {Session} from "../domain/session.entity";
 
 
 export const securityRepository = {
@@ -18,7 +18,7 @@ export const securityRepository = {
         const _id=new ObjectId(deviceId)
         return db.getModels().SessionModel.findOne({ userId, _id, lastActiveDate });
     },
-    async createSession(sessionObject:WithId<SessionModel>) {
+    async createSession(sessionObject:WithId<Session>) {
         const result = await db.getModels().SessionModel.create(sessionObject)
         return result.id
     },

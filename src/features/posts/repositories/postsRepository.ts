@@ -1,10 +1,10 @@
 import {db} from "../../../common/module/db/db"
 import {ObjectId} from "mongodb"
 import {UpdatePostInputModel} from "../types/input/updatePostInput.model";
-import {PostModel} from "../models/post.model";
+import {Post} from "../domain/post.entity";
 
 export const postsRepository = {
-    async createPost(post: PostModel) {
+    async createPost(post: Post) {
         const result = await db.getModels().PostModel.create(post)
         return result.id // return _id -objectId
     },

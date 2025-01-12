@@ -3,7 +3,7 @@ import {ObjectId, WithId} from "mongodb"
 import {SortQueryFilterType} from "../../../common/types/sortQueryFilter.type";
 import {CommentOutputModel} from "../types/output/commentOutput.model";
 import {pagCommentOutputModel} from "../types/output/pagCommentOutput.model";
-import {CommentDocument, CommentModel} from "../models/comment.model";
+import {CommentDocument, Comment} from "../domain/comment.entity";
 
 export const commentsQueryRepository = {
     async findCommentById(id: string):Promise< CommentDocument | null > {
@@ -39,7 +39,7 @@ export const commentsQueryRepository = {
         }
 
     },
-    map(comment:WithId<CommentModel>):CommentOutputModel{
+    map(comment:WithId<Comment>):CommentOutputModel{
         const { _id, postId,...commentForOutPut} = comment;//деструктуризация
         return {id:comment._id.toString(),...commentForOutPut}
     },

@@ -2,16 +2,12 @@ import mongoose, {model} from "mongoose";
 
 import { appConfig } from "../../settings/config";
 import {Blog, BlogModel, blogSchema} from "../../../features/blogs/domain/blog.entity";
-import {UserSchema} from "../../../features/users/models/user.schema";
-import {PostSchema} from "../../../features/posts/models/post.schema";
-import {CommentSchema} from "../../../features/comments/models/comment.schema";
-import {SessionSchema} from "../../../features/security/models/session.schema";
-import {RequestsLogModel} from "../../middleware/rateLimitLogger/requestsLog.model";
-import {SessionModel} from "../../../features/security/models/session.model";
-import {UserModel} from "../../../features/users/models/user.model";
-import {PostModel} from "../../../features/posts/models/post.model";
-import {CommentModel} from "../../../features/comments/models/comment.model";
-import {RequestsLogSchema} from "../../middleware/rateLimitLogger/requestsLog.schema";
+import {Post, PostModel, postSchema} from "../../../features/posts/domain/post.entity";
+import {RequestsLog, RequestsLogModel, requestsLogSchema} from "../../middleware/rateLimitLogger/requestsLog.entity";
+import {Session, sessionSchema} from "../../../features/security/domain/session.entity";
+import {User, UserModel, userSchema} from "../../../features/users/domain/user.entity";
+import {Comment, CommentModel, commentSchema} from "../../../features/comments/domain/comment.entity";
+
 
 
 export const db = {
@@ -45,7 +41,7 @@ export const db = {
             for (const collectionName of collections) {
                 await mongoose.connection.collections[collectionName].deleteMany({});
             }
-            console.log("All collections cleared");
+            console.log("All collections are cleared");
         } catch (e: unknown) {
             console.error('Error in drop db:', e);
             await this.stop();
@@ -55,12 +51,12 @@ export const db = {
     // Метод для получения моделей коллекций
     getModels() {
         return {
-            UserModel: model<UserModel>(appConfig.USERS_COLLECTION_NAME, UserSchema),
+            UserModel: model<User, UserModel>(appConfig.USERS_COLLECTION_NAME, userSchema),
             BlogModel: model<Blog, BlogModel>(appConfig.BLOGS_COLLECTION_NAME, blogSchema),
-            PostModel: mongoose.model<PostModel>(appConfig.POSTS_COLLECTION_NAME, PostSchema),
-            CommentModel: mongoose.model<CommentModel>(appConfig.COMMENTS_COLLECTION_NAME, CommentSchema),
-            RequestsLogModel: mongoose.model<RequestsLogModel>(appConfig.REQUESTS_COLLECTION_NAME, RequestsLogSchema),
-            SessionModel: mongoose.model<SessionModel>(appConfig.SESSIONS_COLLECTION_NAME, SessionSchema),
+            PostModel: model<Post, PostModel>(appConfig.POSTS_COLLECTION_NAME, postSchema),
+            CommentModel: model<Comment, CommentModel>(appConfig.COMMENTS_COLLECTION_NAME, commentSchema),
+            RequestsLogModel: model<RequestsLog, RequestsLogModel>(appConfig.REQUESTS_COLLECTION_NAME, requestsLogSchema),
+            SessionModel: model<Session>(appConfig.SESSIONS_COLLECTION_NAME, sessionSchema),
             //...all collections
         };
     },

@@ -1,10 +1,10 @@
 import {db} from "../../../common/module/db/db"
 import {ObjectId} from "mongodb"
 import {UpdateCommentInputModel} from "../types/input/updateCommentInput.model";
-import {CommentDocument, CommentModel} from "../models/comment.model";
+import {CommentDocument, Comment} from "../domain/comment.entity";
 
 export const commentsRepository = {
-    async createComment(comment:CommentModel):Promise<string> {
+    async createComment(comment:Comment):Promise<string> {
         const CommentsModel = db.getModels().CommentModel
         const newCommentToDB = new CommentsModel(comment)
         await newCommentToDB.save()

@@ -4,7 +4,7 @@ import {CreateUserInputModel} from "../types/input/createUserInput.type";
 import {hashServices} from "../../../common/adapters/hashServices";
 import {ResultClass} from '../../../common/classes/result.class';
 import {ResultStatus} from "../../../common/types/enum/resultStatus";
-import {UserModel} from "../models/user.model";
+import {User} from "../domain/user.entity";
 
 export const usersServices = {
     async createUser(user: CreateUserInputModel) {
@@ -21,7 +21,7 @@ export const usersServices = {
         }
 
 
-        const newUser: UserModel = {
+        const newUser: User = {
             ...{login, email},
             passwordHash: await hashServices.getHash(password),
             createdAt: new Date(),

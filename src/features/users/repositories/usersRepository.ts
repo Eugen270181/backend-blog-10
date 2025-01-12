@@ -1,9 +1,9 @@
 import {db} from "../../../common/module/db/db"
 import {ObjectId} from "mongodb"
-import {UserModel} from "../models/user.model";
+import {User} from "../domain/user.entity";
 
 export const usersRepository = {
-    async createUser(user: UserModel):Promise<string> {
+    async createUser(user: User):Promise<string> {
         const result = await db.getModels().UserModel.create(user)
         return result.id // return _id -objectId
     },

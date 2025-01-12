@@ -1,12 +1,12 @@
 import mongoose from "mongoose";
 import {Db, MongoClient} from "mongodb"
 import {appConfig} from "../../settings/config";
-import {RequestsLogModel} from "../../middleware/rateLimitLogger/requestsLog.model";
-import {PostModel} from "../../../features/posts/models/post.model";
-import {UserModel} from "../../../features/users/models/user.model";
+import {RequestsLog} from "../../middleware/rateLimitLogger/requestsLog.entity";
+import {Post} from "../../../features/posts/domain/post.entity";
+import {User} from "../../../features/users/domain/user.entity";
 import {Blog} from "../../../features/blogs/domain/blog.entity";
-import {CommentModel} from "../../../features/comments/models/comment.model";
-import {SessionModel} from "../../../features/security/models/session.model";
+import {Comment} from "../../../features/comments/domain/comment.entity";
+import {Session} from "../../../features/security/domain/session.entity";
 
 export const db = {
     client: {} as MongoClient,
@@ -47,12 +47,12 @@ export const db = {
     },
     getCollections() {
         return {
-            UserModel: this.getDbName().collection<UserModel>(appConfig.USERS_COLLECTION_NAME),
+            UserModel: this.getDbName().collection<User>(appConfig.USERS_COLLECTION_NAME),
             BlogModel: this.getDbName().collection<Blog>(appConfig.BLOGS_COLLECTION_NAME),
-            PostModel: this.getDbName().collection<PostModel>(appConfig.POSTS_COLLECTION_NAME),
-            CommentModel: this.getDbName().collection<CommentModel>(appConfig.COMMENTS_COLLECTION_NAME),
-            requestsLogCollection: this.getDbName().collection<RequestsLogModel>(appConfig.REQUESTS_COLLECTION_NAME),
-            SessionModel: this.getDbName().collection<SessionModel>(appConfig.SESSIONS_COLLECTION_NAME),
+            PostModel: this.getDbName().collection<Post>(appConfig.POSTS_COLLECTION_NAME),
+            CommentModel: this.getDbName().collection<Comment>(appConfig.COMMENTS_COLLECTION_NAME),
+            requestsLogCollection: this.getDbName().collection<RequestsLog>(appConfig.REQUESTS_COLLECTION_NAME),
+            SessionModel: this.getDbName().collection<Session>(appConfig.SESSIONS_COLLECTION_NAME),
             //...all collections
         }
     },
