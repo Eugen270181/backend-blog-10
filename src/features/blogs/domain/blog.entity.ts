@@ -1,9 +1,12 @@
-import {Model, HydratedDocument, Schema} from 'mongoose';
+import {HydratedDocument, Model, Schema} from 'mongoose';
+import {db} from "../../../common/module/db/DB";
 
 
-export type BlogModel = Model<Blog>
-
-export type BlogDocument = HydratedDocument<Blog>
+export interface IBlogDto {
+    name: string,
+    description: string,
+    websiteUrl: string
+}
 
 export class Blog {
     name: string
@@ -13,21 +16,29 @@ export class Blog {
     deletedAt: Date | null
     isMembership: boolean
 
-    constructor(name: string, description: string, websiteUrl: string) {
+
+    static createBlogDocument({name, description, websiteUrl}: IBlogDto) {
+        const blog = new this()
+
+        blog.name = name
+        blog.description = description
+        blog.websiteUrl = websiteUrl
+        blog.createdAt = new Date()
+        blog.isMembership = false
+
+        const blogModel = db.getModels().BlogModel
+
+        return new blogModel(blog) as BlogDocument
+    }
+
+    deleteBlog() {
+        this.deletedAt = new Date()
+    }
+
+    updateBlog({name, description, websiteUrl}: IBlogDto) {
         this.name = name
         this.description = description
         this.websiteUrl = websiteUrl
-        this.createdAt = new Date()
-        this.deletedAt = null
-        this.isMembership = false
-    }
-    delete(){
-        this.deletedAt = new Date()
-    }
-    update(name?:string, description?:string, websiteUrl?:string) {
-        this.name = name??this.name
-        this.description = description??this.description
-        this.websiteUrl = websiteUrl??this.websiteUrl
     }
 }
 
@@ -36,9 +47,13 @@ export const blogSchema:Schema<Blog> = new Schema<Blog>({
     description: { type: String, required: true },
     websiteUrl: { type: String, required: true },
     createdAt: { type: Date, required: true },
-    deletedAt: { type: Date, required: true, default: null },
-    isMembership: { type: Boolean, required: true },
+    deletedAt: { type: Date, nullable:true, default: null },
+    isMembership: { type: Boolean, required: true }
 })
 
+blogSchema.loadClass(Blog)
 
+export type BlogModelType = Model<Blog>
+
+export type BlogDocument = HydratedDocument<Blog>
 

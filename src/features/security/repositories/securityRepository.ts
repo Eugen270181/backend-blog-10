@@ -1,42 +1,27 @@
-import {db} from "../../../common/module/db/db"
-import {ObjectId, WithId} from "mongodb"
+import {db} from "../../../common/module/db/DB"
 import {SessionFindType} from "../../../common/types/sessionFind.type";
-import {Session} from "../domain/session.entity";
+import {SessionDocument} from "../domain/session.entity";
 
 
-export const securityRepository = {
-    async findSessionById(deviceId:string) {
-        const isIdValid = ObjectId.isValid(deviceId);
-        if (!isIdValid) return null
-        const _id=new ObjectId(deviceId)
-        return db.getModels().SessionModel.findOne({ _id });
-    },
-    async findActiveSession(sessionFilter:SessionFindType) {
-        const { userId, deviceId, lastActiveDate } = sessionFilter
-        const isIdValid = ObjectId.isValid(deviceId);
-        if (!isIdValid) return null
-        const _id=new ObjectId(deviceId)
-        return db.getModels().SessionModel.findOne({ userId, _id, lastActiveDate });
-    },
-    async createSession(sessionObject:WithId<Session>) {
-        const result = await db.getModels().SessionModel.create(sessionObject)
-        return result.id
-    },
-    async updateSession(lastActiveDate:Date, expDate:Date, _id: object) {
-        const filter = { _id }
-        const updater = { $set: { lastActiveDate, expDate } }
-        const result = await db.getModels().SessionModel.updateOne( filter, updater );
-        return result.modifiedCount > 0;
-    },
-    async deleteSession(_id:ObjectId){
-        const result = await db.getModels().SessionModel.deleteOne({ _id });
+
+export class SecurityRepository {
+    private sessionModel = db.getModels().SessionModel
+    async save(sessionDocument: SessionDocument):Promise<void> {
+        await sessionDocument.save();
+    }
+    async findSessionById(deviceId: string):Promise< SessionDocument | null > {
+        return this.sessionModel.findOne({ deviceId })
+    }
+    async findActiveSession( { deviceId, userId, lastActiveDate }: SessionFindType) {
+        return this.sessionModel.findOne({ deviceId, userId, lastActiveDate })
+    }
+    async deleteSession(deviceId:string){
+        const result = await this.sessionModel.deleteOne({deviceId});
         return result.deletedCount > 0
-    },
-    async deleteOtherSessions(userId:string, _id:ObjectId){
-        const filter ={ userId,  _id: { $ne: _id } }
-        const result = await db.getModels().SessionModel.deleteMany(filter);
+    }
+    async deleteOtherSessions(userId:string, deviceId:string){
+        const filter ={ userId,  deviceId: { $ne: deviceId } }
+        const result = await this.sessionModel.deleteMany(filter);
         return result.deletedCount > 0
-    },
-
-
+    }
 }

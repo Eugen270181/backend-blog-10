@@ -1,46 +1,68 @@
-import {db} from "../../../common/module/db/db"
-import {ObjectId, WithId} from "mongodb"
+import {db} from "../../../common/module/db/DB"
+import {WithId} from "mongodb"
 import {SortQueryFilterType} from "../../../common/types/sortQueryFilter.type";
 import {CommentOutputModel} from "../types/output/commentOutput.model";
-import {pagCommentOutputModel} from "../types/output/pagCommentOutput.model";
-import {CommentDocument, Comment} from "../domain/comment.entity";
+import {Comment} from "../domain/comment.entity";
+import {LikeStatus} from "../../likes/domain/like.entity";
+import {LikesRepository} from "../../likes/repository/likesRepository";
 
-export const commentsQueryRepository = {
-    async findCommentById(id: string):Promise< CommentDocument | null > {
-        const CommentsModel = db.getModels().CommentModel
-        return CommentsModel.findOne({ _id: id });
-    },
-    async findCommentAndMap(id: string):Promise< CommentOutputModel | null > {
+export class CommentsQueryRepository {
+    private commentModel = db.getModels().CommentModel
+    constructor(private likesRepository: LikesRepository) {}
+    async findCommentById(_id: string):Promise< WithId<Comment> | null > {
+        return this.commentModel.findOne({ _id , deletedAt:null}).lean().catch(() => null);
+    }
+    async findCommentAndMap(id: string, userId?:string):Promise< CommentOutputModel | null >{
         const comment = await this.findCommentById(id)
-        return comment?this.map(comment):null
-    },
-    async getCommentsAndMap(query:SortQueryFilterType, postId?:string):Promise<pagCommentOutputModel> {
-        const search = postId?{postId:postId}:{}
+        return comment?this.mapComment(comment, userId):null
+    }
+    async getCommentsAndMap(query:SortQueryFilterType, postId?:string, userId?:string) {
+        const search = postId?{postId, deletedAt:null}:{deletedAt:null}
         try {
-            const CommentsModel = db.getModels().CommentModel
-            const comments = await CommentsModel
+            const comments = await this.commentModel
                 .find(search)
                 .sort({[query.sortBy]:query.sortDirection})
                 .skip((query.pageNumber-1)*query.pageSize)
                 .limit(query.pageSize)
-                .exec()
-            const totalCount = await CommentsModel.countDocuments(search)
+                .lean()
+            const totalCount = await this.commentModel.countDocuments(search)
+            const itemsPromisses =  comments.map(el => this.mapComment(el, userId))
+            const items = await Promise.all(itemsPromisses)//асинхронно, не последовательно забираем выполненые промисы
+            //const items = comments.map(async (el) => {return this.mapComment(el, userId)})
+
             return {
                 pagesCount: Math.ceil(totalCount/query.pageSize),
                 page: query.pageNumber,
                 pageSize:query.pageSize,
                 totalCount,
-                items:comments.map(this.map)
+                items
             }
         }
-        catch(e){
+        catch(e) {
             console.log(e)
             throw new Error(JSON.stringify(e))
         }
+    }
+    async mapComment(comment:WithId<Comment>, userId?:string) {
+        const myStatus= await this.checkMyLikeStatus(comment._id.toString(), userId)
+        //console.log(`mystatus:${myStatus}:userId:${userId as string}:commentId:${comment._id.toString()}`)
+        return {
+            id : comment._id.toString(),
+            content : comment.content,
+            commentatorInfo : comment.commentatorInfo,
+            createdAt : comment.createdAt.toISOString(),
+            likesInfo : {
+                likesCount: comment.likeCount,
+                dislikesCount: comment.dislikeCount,
+                myStatus
+            }
+        }
+    }
+    async checkMyLikeStatus(commentId:string, userId?:string) {
+        if (!userId) return LikeStatus.None
 
-    },
-    map(comment:WithId<Comment>):CommentOutputModel{
-        const { _id, postId,...commentForOutPut} = comment;//деструктуризация
-        return {id:comment._id.toString(),...commentForOutPut}
-    },
+        const myStatus = await this.likesRepository.findLikeByAuthorIdAndParentId(userId, commentId)
+
+        return myStatus?myStatus.status:LikeStatus.None
+    }
 }

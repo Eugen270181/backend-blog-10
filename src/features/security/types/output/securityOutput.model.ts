@@ -1,6 +1,6 @@
 export type SecurityOutputModel = {
-    ip: string
-    title: string
-    lastActiveDate: string
     deviceId: string
+    ip: string
+    lastActiveDate: string
+    title: string
 };

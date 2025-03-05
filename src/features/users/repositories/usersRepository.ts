@@ -1,58 +1,32 @@
-import {db} from "../../../common/module/db/db"
-import {ObjectId} from "mongodb"
-import {User} from "../domain/user.entity";
+import {db} from "../../../common/module/db/DB"
+import {UserDocument} from "../domain/user.entity";
 
-export const usersRepository = {
-    async createUser(user: User):Promise<string> {
-        const result = await db.getModels().UserModel.create(user)
-        return result.id // return _id -objectId
-    },
-    async getUserById(id: string) {
-        const isIdValid = ObjectId.isValid(id);
-        if (!isIdValid) return null
-        return db.getModels().UserModel.findOne({ _id: new ObjectId(id) });
-    },
-    async findByLoginOrEmail(inputLogin:string){
-        const search = { $or: [
-            { login: inputLogin },  // поля логина
-            { email: inputLogin }      // или электронная почта
-        ] }
-        return db.getModels().UserModel.findOne(search);
-    },
-    async findUserByLogin(login: string) {
-        return db.getModels().UserModel.findOne({login})
-    },
-    async findUserByEmail(email: string) {
-        return db.getModels().UserModel.findOne({email} )
-    },
-    async findUserByRegConfirmCode(code: string) {
-        return db.getModels().UserModel.findOne({'emailConfirmation.confirmationCode':code} )
-    },
-    async findUserByPassConfirmCode(code: string) {
-        return db.getModels().UserModel.findOne({'passConfirmation.confirmationCode':code} )
-    },
-    async activateConfirmation(_id:ObjectId) {
-        const result = await db.getModels().UserModel
-            .updateOne({_id},{$set:{'emailConfirmation.isConfirmed':true}})
-        return result.modifiedCount === 1
-    },
-    async updatePassHash(_id:ObjectId, passwordHash: string) {
-        const result = await db.getModels().UserModel
-            .updateOne({_id},{$set:{passwordHash}})
-        return result.modifiedCount === 1
-    },
-    async setRegConfirmationCode(_id:ObjectId, code:string, date:Date) {
-        const result = await db.getModels().UserModel
-          .updateOne({_id},{$set:{'emailConfirmation.confirmationCode':code,'emailConfirmation.expirationDate':date}})
-        return result.modifiedCount === 1
-    },
-    async setPassConfirmationCode(_id:ObjectId, code:string, date:Date) {
-        const result = await db.getModels().UserModel
-            .updateOne({_id},{$set:{'passConfirmation.confirmationCode':code,'passConfirmation.expirationDate':date}})
-        return result.modifiedCount === 1
-    },
-    async deleteUser(id:ObjectId){
-        const result = await db.getModels().UserModel.deleteOne({ _id: id });
+export class UsersRepository {
+    private userModel = db.getModels().UserModel
+    async save(userDocument: UserDocument) {
+        await userDocument.save()
+    }
+    async deleteUserById(_id:string){
+        const result = await this.userModel.deleteOne({_id});
         return result.deletedCount > 0
-    },
+    }
+    async findUserById(_id: string):Promise< UserDocument | null > {
+        return this.userModel.findById(_id).catch(()=> null )
+    }
+    async findByLoginOrEmail(inputLogin:string){
+        const search = { $or: [{ login: inputLogin }, { email: inputLogin }] };
+        return this.userModel.findOne(search);
+    }
+    async findUserByLogin(login: string) {
+        return this.userModel.findOne({login} )
+    }
+    async findUserByEmail(email: string) {
+        return this.userModel.findOne({email} )
+    }
+    async findUserByRegConfirmCode(code: string) {
+        return this.userModel.findOne({ 'emailConfirmation.confirmationCode': code } )
+    }
+    async findUserByPassConfirmCode(code: string) {
+        return this.userModel.findOne({ 'passConfirmation.confirmationCode': code} )
+    }
 }

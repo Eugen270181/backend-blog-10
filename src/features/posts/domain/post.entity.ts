@@ -1,10 +1,14 @@
 import {Model, HydratedDocument, Schema} from 'mongoose';
+import {db} from "../../../common/module/db/DB";
 
 
-export type PostModel = Model<Post>
-
-export type PostDocument = HydratedDocument<Post>
-
+export interface IPostDto {
+    title: string,
+    shortDescription: string,
+    content: string,
+    blogId: string,
+    blogName: string
+}
 export class Post {
     title: string
     shortDescription: string
@@ -13,14 +17,30 @@ export class Post {
     blogName: string
     createdAt: Date
     deletedAt: Date | null
-    constructor(title: string, shortDescription: string, content: string, blogId: string, blogName: string) {
+
+    static createPostDocument({title, shortDescription, content, blogId, blogName}: IPostDto) {
+        const post = new this()
+
+        post.title = title
+        post.shortDescription = shortDescription
+        post.content = content
+        post.blogId = blogId
+        post.blogName = blogName
+        post.createdAt = new Date()
+
+        const postModel = db.getModels().PostModel
+
+        return new postModel(post) as PostDocument
+    }
+    deletePost(){
+        this.deletedAt = new Date()
+    }
+    updatePost({title, shortDescription, content, blogId, blogName}: IPostDto) {
         this.title = title
         this.shortDescription = shortDescription
         this.content = content
         this.blogId = blogId
         this.blogName = blogName
-        this.createdAt = new Date()
-        this.deletedAt = null
     }
 }
 
@@ -31,7 +51,13 @@ export const postSchema:Schema<Post> = new Schema<Post>({
     blogId: { type: String, require: true }, // valid
     blogName: { type: String, require: true },
     createdAt: { type: Date, require: true },
-    deletedAt: { type: Date, required: true, default: null },
+    deletedAt: { type: Date, nullable:true, default: null }
 })
+
+postSchema.loadClass(Post)
+
+export type PostModelType = Model<Post>
+
+export type PostDocument = HydratedDocument<Post>
 
 

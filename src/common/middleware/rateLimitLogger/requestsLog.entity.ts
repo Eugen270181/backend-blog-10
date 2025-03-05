@@ -1,9 +1,7 @@
-import {HydratedDocument, Model, Schema} from "mongoose";
+import {Model, Schema} from "mongoose";
 
 
-export type RequestsLogModel = Model<RequestsLog>
-
-export type RequestsLogDocument = HydratedDocument<RequestsLog>;
+export type RequestsLogModelType = Model<RequestsLog>
 
 export type RequestsLog = {
     ip: string

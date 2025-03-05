@@ -1,25 +1,20 @@
-import {db} from "../../../common/module/db/db"
-import {ObjectId, WithId} from "mongodb"
+import {db} from "../../../common/module/db/DB"
+import {WithId} from "mongodb"
 import {SecurityOutputModel} from "../types/output/securityOutput.model";
 import {Session} from "../domain/session.entity";
 
-export const securityQueryRepository = {
+export class SecurityQueryRepository {
+    private sessionModel = db.getModels().SessionModel
     async getActiveSessionsAndMap(userId?:string):Promise<SecurityOutputModel[]> { // используем этот метод если проверили валидность и существование в бд значения blogid
         const dateNow = new Date();
-        const filter = {"expDate":{ $gt:dateNow }, ...(userId && { userId })}
+        const filter = { "expDate":{ $gt:dateNow }, ...(userId && { userId }) }
 
-        try {
-            const sessions = await db.getModels().SessionModel.find(filter).lean()
+        const sessions = await this.sessionModel.find(filter).lean()
 
-            return sessions.map(this.map)
-        }
-        catch(e){
-            console.log(e)
-            throw new Error(JSON.stringify(e))
-        }
-    },
+        return sessions.map(this.map)
+    }
     map(session:WithId<Session>):SecurityOutputModel {
-        const { ip, title, lastActiveDate, _id} = session;//деструктуризация
-        return { deviceId:_id.toString(), ip, lastActiveDate:lastActiveDate.toISOString(), title  }
+        const { ip, title, lastActiveDate, deviceId} = session;//деструктуризация
+        return { deviceId, ip, lastActiveDate:lastActiveDate.toISOString(), title  }
     }
 }

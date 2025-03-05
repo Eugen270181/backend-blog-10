@@ -1,18 +1,16 @@
+import {appConfig} from "../../src/common/settings/config";
+
 const request = require("supertest")
 //import request from "supertest";
 import {initApp} from "../../src/initApp";
 import {MongoMemoryServer} from "mongodb-memory-server";
 
-import {db} from "../../src/common/module/db/db";
+import {db} from "../../src/common/module/db/DB";
 
 import {routersPaths} from "../../src/common/settings/paths";
 import {ADMIN_LOGIN, ADMIN_PASS} from "../../src/common/middleware/adminMiddleware";
 import {createUser} from "./utils/createUsers";
 import {testingDtosCreator} from "./utils/testingDtosCreator";
-import {appConfig} from "../../src/common/settings/config";
-
-
-
 
 
 
@@ -21,9 +19,9 @@ describe('USERS_TESTS', () => {
     const app = initApp()
 
     beforeAll(async () => {
-        const mongoServer = await MongoMemoryServer.create()
-        await db.run(mongoServer.getUri());
-        //await db.run(appConfig.MONGO_URI);
+        //const mongoServer = await MongoMemoryServer.create()
+        //await db.run(mongoServer.getUri());
+        await db.run(appConfig.MONGO_URI);
     })
 
     beforeEach(async () => {
@@ -101,13 +99,13 @@ describe('USERS_TESTS', () => {
             .send(userDto)
             .expect(400);
     });
-    it('shouldn`t delete user by id without authorization: STATUS 401', async () => {
+    it('shouldn`t deletePost user by id without authorization: STATUS 401', async () => {
         const user = await createUser(app);
 
         await request(app).delete(`${routersPaths.users + '/' + user.id}`).expect(401);
     });
 
-    it('should delete user by id: STATUS 204', async () => {
+    it('should deletePost user by id: STATUS 204', async () => {
         const user = await createUser(app);
 
         await request(app)
@@ -116,7 +114,7 @@ describe('USERS_TESTS', () => {
             .expect(204);
     });
 
-    it('shouldn`t delete user by id if specified user is not exists: STATUS 404', async () => {
+    it('shouldn`t deletePost user by id if specified user is not exists: STATUS 404', async () => {
         await request(app)
             .delete(`${routersPaths.users + '/555'}`)
             .auth(ADMIN_LOGIN, ADMIN_PASS)

@@ -1,17 +1,15 @@
 import request from "supertest";
 import {initApp} from "../../../src/initApp";
-import {MongoMemoryServer} from "mongodb-memory-server";
-import {db} from "../../../src/common/module/db/db";
+import {db} from "../../../src/common/module/db/DB";
 import {routersPaths} from "../../../src/common/settings/paths";
 import {ADMIN_LOGIN, ADMIN_PASS} from "../../../src/common/middleware/adminMiddleware";
-//import {createUser} from "./utils/createUsers";
-//import {testingDtosCreator} from "./utils/testingDtosCreator";
 import {appConfig} from "../../../src/common/settings/config";
 import {CreateBlogInputModel} from "../../../src/features/blogs/types/input/createBlogInput.model";
 import {BlogOutputModel} from "../../../src/features/blogs/types/output/blogOutput.model";
 import {createString} from "../utils/datasets";
 import {OutputErrorsType} from "../../../src/common/types/outputErrors.type";
 import {UpdateBlogInputModel} from "../../../src/features/blogs/types/input/updateblogInput.model";
+//import {MongoMemoryServer} from "mongodb-memory-server";
 
 describe(`<<BLOGS>> ENDPOINTS TESTING!!!`, ()=>{
 

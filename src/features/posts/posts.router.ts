@@ -1,26 +1,20 @@
 import {Router} from 'express'
-import {createPostController} from './controllers/createPostController'
-import {getPostsController} from './controllers/getPostsController'
-import {findPostController} from './controllers/findPostController'
-import {delPostController} from './controllers/delPostController'
-import {updatePostController} from './controllers/updatePostController'
-import {postValidators} from './middlewares/postValidators'
 import {adminMiddleware} from '../../common/middleware/adminMiddleware'
-import {findPostCommentsController} from "./controllers/findPostCommentsController";
 import {accessTokenMiddleware} from "../../common/middleware/accessTokenMiddleware";
 import {commentValidators} from "../comments/middlewares/commentValidators";
-import {createPostCommentController} from "./controllers/createPostCommentController";
 import {querySortSanitizers} from "../../common/middleware/querySortSanitizerMiddleware";
+import {postValidators} from "../../common/middleware/postValidatonMiddleware";
+import {postsController} from "../../ioc";
 
 export const postsRouter = Router()
 
 
-postsRouter.get('/', ...querySortSanitizers, getPostsController)
-postsRouter.get('/:id', findPostController)
-postsRouter.get('/:id/comments', ...querySortSanitizers, findPostCommentsController)//new - task-06
-postsRouter.post('/:id/comments', accessTokenMiddleware,...commentValidators, createPostCommentController)//new - task-06
-postsRouter.post('/',  adminMiddleware, ...postValidators, createPostController)
-postsRouter.delete('/:id',  adminMiddleware, delPostController)
-postsRouter.put('/:id', adminMiddleware, ...postValidators, updatePostController)
+postsRouter.get('/', ...querySortSanitizers, postsController.getPostsController.bind(postsController))
+postsRouter.get('/:id', postsController.findPostController.bind(postsController))
+postsRouter.get('/:id/comments', accessTokenMiddleware,...querySortSanitizers, postsController.getPostCommentsController.bind(postsController))
+postsRouter.post('/:id/comments', accessTokenMiddleware,...commentValidators, postsController.createPostCommentController.bind(postsController))
+postsRouter.post('/',  adminMiddleware, ...postValidators, postsController.createPostController.bind(postsController))
+postsRouter.delete('/:id',  adminMiddleware, postsController.delPostController.bind(postsController))
+postsRouter.put('/:id', adminMiddleware, ...postValidators, postsController.updatePostController.bind(postsController))
 
 // не забудьте добавить роут в апп

@@ -1,6 +1,6 @@
 export type SortQueryFieldsType = {
     sortBy?: string;
-    pageNumber?: number;
+    pageNumber?: string;
     pageSize?: string;
     sortDirection?: string;
 }

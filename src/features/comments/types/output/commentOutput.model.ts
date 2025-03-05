@@ -1,4 +1,5 @@
 import {CommentatorInfo} from "../../domain/comment.entity";
+import {LikesInfoOutputModel} from "../../../likes/types/output/likesInfoOutputModel";
 
 
 export type CommentOutputModel = {
@@ -6,4 +7,5 @@ export type CommentOutputModel = {
     content: string
     commentatorInfo: CommentatorInfo
     createdAt: string
+    likesInfo: LikesInfoOutputModel
 }

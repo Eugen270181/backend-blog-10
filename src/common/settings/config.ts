@@ -13,6 +13,7 @@ export const appConfig = {
     COMMENTS_COLLECTION_NAME:process.env.COMMENTS_COLLECTION_NAME || 'Comments',
     REQUESTS_COLLECTION_NAME:process.env.REQUESTS_COLLECTION_NAME || 'RequestsLogs',
     SESSIONS_COLLECTION_NAME:process.env.SESSIONS_COLLECTION_NAME || 'Sessions',
+    LIKES_COLLECTION_NAME:process.env.LIKES_COLLECTION_NAME || 'Likes',
 
     AT_SECRET:process.env.DB_NAME as string || 'f1f5deg4hy5fr5d5g',
     AT_TIME: process.env.AT_TIME as string || '10s',

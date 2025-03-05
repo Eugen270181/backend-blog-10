@@ -1,26 +1,26 @@
 import {BlogsRepository} from "../repositories/blogsRepository";
 import {CreateBlogInputModel} from "../types/input/createBlogInput.model";
 import {UpdateBlogInputModel} from "../types/input/updateblogInput.model";
-import {BlogDocument, Blog} from "../domain/blog.entity";
+import {Blog, BlogDocument, IBlogDto} from "../domain/blog.entity";
 
 
 export class BlogsServices {
-    private blogsRepository: BlogsRepository
-    constructor() {
-        this.blogsRepository = new BlogsRepository()
-     }
+    constructor(private blogsRepository: BlogsRepository) {}
     async createBlog(blog: CreateBlogInputModel):Promise<string> {
         const {name, description, websiteUrl} = blog
 
-        const newBlog:Blog = new Blog(name, description, websiteUrl)
+        const newBlogDto:IBlogDto = {name, description, websiteUrl}
+        const newBlogDocument:BlogDocument = Blog.createBlogDocument(newBlogDto)
 
-        return this.blogsRepository.save(newBlog)
+        await this.blogsRepository.save(newBlogDocument)
+
+        return newBlogDocument.id
     }
     async deleteBlog(id:string){
         const foundBlogDocument: BlogDocument | null = await this.blogsRepository.findBlogById(id);
         if (!foundBlogDocument) return false;
 
-        foundBlogDocument.delete();
+        foundBlogDocument.deleteBlog();
 
         await this.blogsRepository.save(foundBlogDocument);
         return true;
@@ -30,7 +30,8 @@ export class BlogsServices {
         if (!foundBlogDocument) return false;
 
         const {name, description, websiteUrl} = blog
-        foundBlogDocument.update(name, description, websiteUrl)
+        const updateBlogDto:IBlogDto = {name, description, websiteUrl}
+        foundBlogDocument.updateBlog(updateBlogDto)
 
         await this.blogsRepository.save(foundBlogDocument);
         return true;

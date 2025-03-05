@@ -1,14 +1,11 @@
-import {Response, Router} from 'express'
+import {Router} from 'express'
 import {blogValidators} from './middlewares/blogValidators'
 import {adminMiddleware} from '../../common/middleware/adminMiddleware'
-import {blogPostValidators} from "../posts/middlewares/postValidators";
 import {querySortSanitizers} from "../../common/middleware/querySortSanitizerMiddleware";
-import {blogsController} from "./controllers/blogs.controler";
-
+import {blogPostValidators} from "../../common/middleware/postValidatonMiddleware";
+import {blogsController} from "../../ioc";
 
 export const blogsRouter = Router()
-
-
 
 blogsRouter.get('/', ...querySortSanitizers, blogsController.getBlogsController.bind(blogsController))
 blogsRouter.get('/:id', blogsController.findBlogController.bind(blogsController))

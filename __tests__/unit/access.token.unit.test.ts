@@ -1,9 +1,9 @@
 import {MongoMemoryServer} from "mongodb-memory-server";
-import {db} from "../../src/db";
-import {authService} from "../../src/auth/auth.service";
-import {jwtService} from "../../src/common/adapters/jwt.service";
-import {ResultStatus} from "../../src/common/types/resultCode";
-import {usersRepository} from "../../src/users/user.repositories";
+import {db} from "../../src/common/module/db/DB";
+import {authServices, usersRepository} from "../../src/ioc";
+import {ResultStatus} from "../../src/common/types/enum/resultStatus";
+import {jwtServices} from "../../src/common/adapters/jwtServices";
+
 
 describe('UNIT', () => {
 
@@ -22,8 +22,8 @@ describe('UNIT', () => {
     })
 
     afterAll((done) => done())
-
-    const checkAccessTokenUseCase = authService.checkAccessToken
+//TODO
+    const checkAccessTokenUseCase = authServices.checkAccessToken
     it('should not verify noBearer auth', async () => {
         const result = await checkAccessTokenUseCase('Basic gbfbfbbhf')
 
@@ -32,7 +32,7 @@ describe('UNIT', () => {
     })
 
     it('should not verify in jwtService', async () => {
-        jwtService.verifyToken = jest.fn().mockImplementation(async (token: string) => null)
+        jwtServices.verifyToken = jest.fn().mockImplementation(async (token: string) => null)
 
         const result = await checkAccessTokenUseCase('Bearer gbfbfbbhf')
 
@@ -40,10 +40,10 @@ describe('UNIT', () => {
 
     })
 
-    it('should not verify in usersRepository', async () => {
-        jwtService.verifyToken = jest.fn().mockImplementation(async (token: string) => ({userId: '1'}))
+    it('should not verify in UsersRepository', async () => {
+        jwtServices.verifyToken = jest.fn().mockImplementation(async (token: string) => {userId: '1'})
 
-        usersRepository.doesExistById = jest.fn().mockImplementation(async (userId: string) => false)
+        usersRepository.findUserById = jest.fn().mockImplementation(async (userId: string) => null)
 
         const result = await checkAccessTokenUseCase('Bearer gbfbfbbhf')
 
@@ -52,9 +52,9 @@ describe('UNIT', () => {
     })
 
     it('should verify access token', async () => {
-        jwtService.verifyToken = jest.fn().mockImplementation(async (token: string) => ({userId: '1'}))
+        jwtServices.verifyToken = jest.fn().mockImplementation(async (token: string) => ({userId: '1'}))
 
-        usersRepository.doesExistById = jest.fn().mockImplementation(async (userId: string) => true)
+        usersRepository.findUserById = jest.fn().mockImplementation(async (userId: string) => true)
 
         const result = await checkAccessTokenUseCase('Bearer gbfbfbbhf')
 

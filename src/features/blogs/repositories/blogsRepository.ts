@@ -1,15 +1,14 @@
-import {db} from "../../../common/module/db/db"
-import {BlogDocument, Blog} from "../domain/blog.entity";
+import {db} from "../../../common/module/db/DB"
+import {BlogDocument} from "../domain/blog.entity";
 
 export class BlogsRepository {
-    private BlogModel = db.getModels().BlogModel
-    async save(blog: Blog):Promise<string> {
-        const newBlogDocument:BlogDocument = new this.BlogModel(blog)
-        const savedDocument = await newBlogDocument.save();
-        return savedDocument.id
+    private blogModel = db.getModels().BlogModel
+
+    async save(blogDocument: BlogDocument):Promise<void> {
+        await blogDocument.save();
     }
     async findBlogById(id: string):Promise< BlogDocument | null > {
-        return this.BlogModel.findOne({ id , deletedAt:null})
+        return this.blogModel.findOne({ _id: id , deletedAt: null }).catch(()=> null )
     }
 }
 

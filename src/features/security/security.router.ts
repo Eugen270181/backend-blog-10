@@ -1,13 +1,11 @@
 import {Router} from 'express'
 import {routersPaths} from "../../common/settings/paths";
-import {getSecurityDevicesController} from "./controllers/getSecurityDevicesController";
-import {delSecurityDevicesController} from "./controllers/delSecurityDevicesController";
-import {delSecurityDeviceController} from "./controllers/delSecurityDeviceController";
+import {securityController} from "../../ioc";
 
 export const securityRouter = Router()
 
-securityRouter.get(routersPaths.inSecurity, getSecurityDevicesController)
-securityRouter.delete(routersPaths.inSecurity, delSecurityDevicesController)
-securityRouter.delete(routersPaths.inSecurity+'/:id', delSecurityDeviceController)
+securityRouter.get(routersPaths.inSecurity, securityController.getSecurityDevicesController.bind(securityController))
+securityRouter.delete(routersPaths.inSecurity, securityController.delSecurityDevicesController.bind(securityController))
+securityRouter.delete(routersPaths.inSecurity+'/:id', securityController.delSecurityDeviceController.bind(securityController))
 
 

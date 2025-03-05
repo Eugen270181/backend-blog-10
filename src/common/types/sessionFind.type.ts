@@ -1,1 +1,5 @@
-export type SessionFindType = { userId: string, deviceId: string, lastActiveDate: Date }
+export type SessionFindType = {
+    deviceId: string,
+    userId: string,
+    lastActiveDate: Date
+}
